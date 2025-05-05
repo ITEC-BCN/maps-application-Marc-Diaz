@@ -54,7 +54,7 @@ fun MarkerListScreen(modifier: Modifier = Modifier, navigateToDetail: (Int) -> U
             val dissmissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = {
                     if (it == SwipeToDismissBoxValue.EndToStart) {
-                        appViewModel.deleteMarcador(marcador.id!!)
+                        appViewModel.deleteMarcador(marcador.id!!, marcador.imagen)
                         appViewModel.getAllMarcadores()
                         true
                     } else {

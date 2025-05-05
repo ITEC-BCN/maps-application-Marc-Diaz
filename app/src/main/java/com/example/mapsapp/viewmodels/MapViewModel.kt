@@ -3,18 +3,19 @@ package com.example.mapsapp.viewmodels
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mapsapp.MyApp
 import com.example.mapsapp.data.Marcador
-import com.example.mapsapp.utils.latLangToString
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 class MapViewModel(): ViewModel() {
@@ -37,31 +38,45 @@ class MapViewModel(): ViewModel() {
     }
 
     //Añadir marcador
-    fun insertarMarcador(latLng: LatLng){
-
-        val marcador = Marcador(
-            titulo = _titulo.value ?: "",
-            descripcion = _descripcion.value ?: "",
-            imagen = "",
-            latLng = latLangToString(latLng)
-        )
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun insertarMarcador(latLng: String) {
+        val stream = ByteArrayOutputStream()
+        _imagenBitMap.value?.compress(Bitmap.CompressFormat.PNG, 0, stream)
         CoroutineScope(Dispatchers.IO).launch {
-            db.insertMarcador(marcador)
+            var imageName = ""
+            if (_imagenBitMap.value != null) {
+                imageName = db.uploadImage(stream.toByteArray())
+            }
+
+            db.insertMarcador(Marcador(
+                titulo = _titulo.value ?: "",
+                descripcion = descripcion.value ?: "",
+                imagen = imageName,
+                latLng = latLng
+            ))
         }
-        Log.d("LISTA", "${marcadores.value}")
     }
 
     //Actualizar marcador
-    fun updateMarcador(id: Int, titulo: String, descripcion: String, imagen : String){
+    fun updateMarcador(id: Int, titulo: String, descripcion: String, imagen : Bitmap?){
+        val stream = ByteArrayOutputStream()
+        imagen?.compress(Bitmap.CompressFormat.PNG, 0, stream)
+        val imageName = _marcador.value?.imagen?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
+        Log.d("PASA POR AQUI", "$imageName")
         CoroutineScope(Dispatchers.IO).launch {
-            db.updateMarcador(id, titulo, descripcion, imagen)
+            db.updateMarcador(
+                id, titulo, descripcion,
+                imageName = imageName.toString(),
+                imageFile = stream.toByteArray()
+            )
         }
     }
 
     //Borrar marcador
-    fun deleteMarcador(id: Int){
+    fun deleteMarcador(id: Int, imagen : String){
         CoroutineScope(Dispatchers.IO).launch {
             db.deleteMarcador(id)
+            db.deleteImage(imagen)
         }
     }
 

@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,13 +37,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mapsapp.utils.stringToLatLng
 import com.example.mapsapp.viewmodels.MapViewModel
-import com.google.android.gms.maps.model.LatLng
-import java.io.File
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateMarkerScreen(latLng: String, navigateBack: () -> Unit){
     val context = LocalContext.current
@@ -114,7 +113,7 @@ fun CreateMarkerScreen(latLng: String, navigateBack: () -> Unit){
         }
         Button(
             onClick = {
-                appViewModel.insertarMarcador(stringToLatLng(latLng))
+                appViewModel.insertarMarcador(latLng)
                 navigateBack()
             }
         ) {
