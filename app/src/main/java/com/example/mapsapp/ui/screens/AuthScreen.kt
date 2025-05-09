@@ -36,18 +36,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mapsapp.data.SessionManager
+import com.example.mapsapp.data.SupabaseManager
 import com.example.mapsapp.utils.AuthResponse
 import com.example.mapsapp.viewmodels.AuthViewModel
+import com.example.mapsapp.viewmodels.AuthViewModelFactory
 
 
 @Composable
 fun AuthScreen(navigateToHome : () -> Unit){
     val context = LocalContext.current
-    val authViewModel = viewModel<AuthViewModel>()
+    val authViewModel = viewModel<AuthViewModel>( factory = AuthViewModelFactory(SupabaseManager(LocalContext.current)))
     val email by authViewModel.email.observeAsState("")
     val password by authViewModel.password.observeAsState("")
     val showError by authViewModel.showError.observeAsState(false)
     val authState by authViewModel.authState.observeAsState()
+    val sesionAnterior by authViewModel.sesionAnterionr.observeAsState()
+
+    LaunchedEffect(sesionAnterior) {
+        authViewModel.restoreSession()
+    }
 
     Column(
         Modifier.fillMaxSize(),

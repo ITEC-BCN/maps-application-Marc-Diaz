@@ -6,9 +6,13 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,8 +42,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mapsapp.viewmodels.MapViewModel
+import androidx.core.graphics.scale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -66,7 +72,34 @@ fun CreateMarkerScreen(latLng: String, navigateBack: () -> Unit) {
             rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
                 if (success && imagenURI != null) {
                     val stream = context.contentResolver.openInputStream(imagenURI!!)
-                    appViewModel.setImagenBitMap(BitmapFactory.decodeStream(stream))
+                    stream?.use {
+                        // Decodificar el flujo a un Bitmap
+                        val originalBitmap = BitmapFactory.decodeStream(it)
+
+                        // Obtener las dimensiones originales de la imagen
+                        val originalWidth = originalBitmap.width
+                        val originalHeight = originalBitmap.height
+
+                        // Definir el aspect ratio (relación entre ancho y alto)
+                        val aspectRatio = originalWidth.toFloat() / originalHeight.toFloat()
+
+                        // Establecer el tamaño máximo que deseas para la imagen (por ejemplo, un ancho máximo)
+                        val maxWidth = 800 // Puedes establecer el valor que prefieras
+
+                        // Calcular el nuevo ancho y alto manteniendo el aspect ratio
+                        val newWidth = maxWidth
+                        val newHeight = (newWidth / aspectRatio).toInt()
+
+                        // Redimensionar el bitmap mientras se mantiene el aspect ratio
+                        val resizedBitmap = originalBitmap.scale(newWidth, newHeight)
+
+                        // Establecer el Bitmap redimensionado en el ViewModel
+                        appViewModel.setImagenBitMap(resizedBitmap)
+                    } ?: run {
+                        Log.e("TakePicture", "Error al abrir InputStream para la URI de la imagen.")
+                    }
+                } else {
+                    Log.e("TakePicture", "La imagen no fue tomada o la URI de la imagen es nula.")
                 }
             }
         //Galeria

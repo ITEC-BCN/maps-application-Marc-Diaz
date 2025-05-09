@@ -75,6 +75,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,7 +97,8 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:storage-kt:$3.1.4")
     implementation("io.github.jan-tennert.supabase:auth-kt:3.1.4")
     implementation(libs.coil.compose)
-
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.coroutines.android)
 
 }
 secrets {

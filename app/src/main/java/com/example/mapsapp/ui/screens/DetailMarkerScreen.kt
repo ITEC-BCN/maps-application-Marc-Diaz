@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.scale
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
@@ -60,7 +61,34 @@ fun DetailMarkerScreen(marcadorId: Int, navigateBack: () -> Unit) {
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success && imagenURI != null) {
                 val stream = context.contentResolver.openInputStream(imagenURI!!)
-                appViewModel.setImagenBitMap(BitmapFactory.decodeStream(stream))
+                stream?.use {
+                    // Decodificar el flujo a un Bitmap
+                    val originalBitmap = BitmapFactory.decodeStream(it)
+
+                    // Obtener las dimensiones originales de la imagen
+                    val originalWidth = originalBitmap.width
+                    val originalHeight = originalBitmap.height
+
+                    // Definir el aspect ratio (relación entre ancho y alto)
+                    val aspectRatio = originalWidth.toFloat() / originalHeight.toFloat()
+
+                    // Establecer el tamaño máximo que deseas para la imagen (por ejemplo, un ancho máximo)
+                    val maxWidth = 800 // Puedes establecer el valor que prefieras
+
+                    // Calcular el nuevo ancho y alto manteniendo el aspect ratio
+                    val newWidth = maxWidth
+                    val newHeight = (newWidth / aspectRatio).toInt()
+
+                    // Redimensionar el bitmap mientras se mantiene el aspect ratio
+                    val resizedBitmap = originalBitmap.scale(newWidth, newHeight)
+
+                    // Establecer el Bitmap redimensionado en el ViewModel
+                    appViewModel.setImagenBitMap(resizedBitmap)
+                } ?: run {
+                    Log.e("TakePicture", "Error al abrir InputStream para la URI de la imagen.")
+                }
+            } else {
+                Log.e("TakePicture", "La imagen no fue tomada o la URI de la imagen es nula.")
             }
         }
 
