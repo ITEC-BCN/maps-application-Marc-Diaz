@@ -22,4 +22,7 @@ sealed class Destinations{
 
     @Serializable
     object PantallaDrawer: Destinations()
+
+    @Serializable
+    object PantallaAutenticacion : Destinations()
 }

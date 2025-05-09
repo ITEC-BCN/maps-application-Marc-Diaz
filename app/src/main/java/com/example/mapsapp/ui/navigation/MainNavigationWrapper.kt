@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mapsapp.ui.screens.AuthScreen
 import com.example.mapsapp.ui.screens.CreateMarkerScreen
 import com.example.mapsapp.ui.screens.DrawerScreen
 import com.example.mapsapp.ui.screens.MapScreen
@@ -19,7 +20,11 @@ fun MainNavigationWrapper() {
     NavHost(navController, Destinations.PantallaPermisos) {
 
         composable<Destinations.PantallaPermisos>{
-            PermissionsScreen { navController.navigate(Destinations.PantallaDrawer) }
+            PermissionsScreen { navController.navigate(Destinations.PantallaAutenticacion) }
+        }
+
+        composable<Destinations.PantallaAutenticacion>{
+            AuthScreen { navController.navigate(Destinations.PantallaDrawer) }
         }
 
         composable<Destinations.PantallaDrawer>{

@@ -81,10 +81,10 @@ fun MarcadorSwipe(
         confirmValueChange = {
             if (it == SwipeToDismissBoxValue.EndToStart){
                 appViewModel.deleteMarcador(marcador.id!!, marcador.imagen)
+                true
             }
-            else if (it == SwipeToDismissBoxValue.Settled) return@rememberSwipeToDismissBoxState false
+            else { false }
 
-            return@rememberSwipeToDismissBoxState true
         },
         // positional threshold of 25%
         positionalThreshold = { it * .25f }
