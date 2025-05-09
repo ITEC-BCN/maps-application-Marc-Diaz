@@ -2,9 +2,11 @@ package com.example.mapsapp.ui.screens
 
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,9 +38,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.mapsapp.viewmodels.MapViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DetailMarkerScreen(marcadorId: Int, navigateBack: () -> Unit) {
     val context = LocalContext.current
@@ -68,13 +74,20 @@ fun DetailMarkerScreen(marcadorId: Int, navigateBack: () -> Unit) {
             }
         }
 
+    val imageLoader = ImageLoader(context)
+
+    LaunchedEffect(Unit) {
+        imageLoader.memoryCache?.clear()
+        imageLoader.diskCache?.clear()
+    }
+
     //Dialogo
     var showDialog by remember { mutableStateOf(false) }
     //Obtener marcador
     LaunchedEffect(marcador) {
         appViewModel.getMarcadorById(marcadorId)
     }
-
+    Log.d("Imagen path", "${marcador?.imagen}")
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

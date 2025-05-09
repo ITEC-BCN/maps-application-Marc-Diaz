@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,82 +43,106 @@ import com.example.mapsapp.viewmodels.MapViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CreateMarkerScreen(latLng: String, navigateBack: () -> Unit){
+fun CreateMarkerScreen(latLng: String, navigateBack: () -> Unit) {
     val context = LocalContext.current
     val appViewModel: MapViewModel = viewModel<MapViewModel>()
     val titulo by appViewModel.titulo.observeAsState("")
     val descripcion by appViewModel.descripcion.observeAsState("")
     val imagenURI by appViewModel.imagenURI.observeAsState()
     val imagenBitmap by appViewModel.imagenBitMap.observeAsState()
-    //Camara
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success && imagenURI != null) {
-                val stream = context.contentResolver.openInputStream(imagenURI!!)
-                appViewModel.setImagenBitMap(BitmapFactory.decodeStream(stream))
-            }
+    val cargados by appViewModel.cargados.observeAsState()
+
+    //Navegacion
+    if (cargados == true) {
+        navigateBack()
+    } else if (cargados == false) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Insertando Marcador")
+        }
     }
-    //Galeria
-    val pickImageLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                appViewModel.setImagenURI(it)
-                val stream = context.contentResolver.openInputStream(it)
-                appViewModel.setImagenBitMap(BitmapFactory.decodeStream(stream))
-            }
-        }
-
-    //Dialogo
-    var showDialog by remember { mutableStateOf(false) }
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        OutlinedTextField(
-            value = titulo,
-            onValueChange = { appViewModel.setTitulo(it) },
-            modifier = Modifier.padding(8.dp).fillMaxWidth(),
-            label = { Text("Titulo")}
-        )
-        OutlinedTextField(
-            value = descripcion,
-            onValueChange = { appViewModel.setDescripcion(it) },
-            modifier = Modifier.padding(8.dp).fillMaxWidth(),
-            label = { Text("Descripcion")}
-        )
-        Button(
-            onClick = {
-                showDialog = true
-
-            }
-        ) {
-            Text("Abrir camara o galeria")
-        }
-        if (showDialog) {
-            AlertDialog(onDismissRequest = { showDialog = false }, title = { Text("Selecciona una opción") },
-                text = { Text("¿Quieres tomar una foto o elegir una desde la galería?") },
-                confirmButton = {TextButton(onClick = {
-                    showDialog = false
-                    appViewModel.createImageUri(context)
-                    launcher.launch(imagenURI)
-                }) { Text("Tomar Foto") }
-                },
-                dismissButton = {TextButton(onClick = {
-                    showDialog = false
-                    pickImageLauncher.launch("image/*")
-                }) { Text("Elegir de Galería") }
+    //Camara
+    else {
+        val launcher =
+            rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+                if (success && imagenURI != null) {
+                    val stream = context.contentResolver.openInputStream(imagenURI!!)
+                    appViewModel.setImagenBitMap(BitmapFactory.decodeStream(stream))
                 }
-            )
-        }
-
-        imagenBitmap?.let {
-            Image(bitmap = it.asImageBitmap(), contentDescription = null,
-                modifier = Modifier.size(300.dp).clip(RoundedCornerShape(12.dp)),contentScale = ContentScale.Crop)
-
-        }
-        Button(
-            onClick = {
-                appViewModel.insertarMarcador(latLng)
-                navigateBack()
             }
+        //Galeria
+        val pickImageLauncher =
+            rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+                uri?.let {
+                    appViewModel.setImagenURI(it)
+                    val stream = context.contentResolver.openInputStream(it)
+                    appViewModel.setImagenBitMap(BitmapFactory.decodeStream(stream))
+                }
+            }
+
+        //Dialogo
+        var showDialog by remember { mutableStateOf(false) }
+        Column(
+            Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Add")
+            OutlinedTextField(
+                value = titulo,
+                onValueChange = { appViewModel.setTitulo(it) },
+                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                label = { Text("Titulo") }
+            )
+            OutlinedTextField(
+                value = descripcion,
+                onValueChange = { appViewModel.setDescripcion(it) },
+                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                label = { Text("Descripcion") }
+            )
+            Button(
+                onClick = {
+                    showDialog = true
+
+                }
+            ) {
+                Text("Abrir camara o galeria")
+            }
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Selecciona una opción") },
+                    text = { Text("¿Quieres tomar una foto o elegir una desde la galería?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showDialog = false
+                            appViewModel.createImageUri(context)
+                            launcher.launch(imagenURI)
+                        }) { Text("Tomar Foto") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showDialog = false
+                            pickImageLauncher.launch("image/*")
+                        }) { Text("Elegir de Galería") }
+                    }
+                )
+            }
+
+            imagenBitmap?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.size(300.dp).clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+            }
+            Button(
+                onClick = {
+                    appViewModel.insertarMarcador(latLng)
+                }
+            ) {
+                Text("Add")
+            }
         }
     }
 }

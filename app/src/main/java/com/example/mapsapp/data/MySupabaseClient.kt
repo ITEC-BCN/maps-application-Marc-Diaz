@@ -1,5 +1,6 @@
 package com.example.mapsapp.data
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.mapsapp.BuildConfig
 import io.github.jan.supabase.SupabaseClient
@@ -39,10 +40,10 @@ class MySupabaseClient {
     fun buildImageUrl(imageFileName: String) = "${this.supabaseUrl}/storage/v1/object/public/images/${imageFileName}"
 
     suspend fun deleteImage(imageName: String) {
-        val imgName =
-            imageName.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
+        val imgName = imageName.removePrefix("https://gwcqsozqzdlxjrpijrbk.supabase.co/storage/v1/object/public/images/")
         marcador.storage.from("images").delete(imgName)
-    }    suspend fun getAllMarcadores(): List<Marcador>{
+    }
+    suspend fun getAllMarcadores(): List<Marcador>{
         return marcador.from("Marcadores").select().decodeList()
     }
 
@@ -59,16 +60,20 @@ class MySupabaseClient {
         this.marcador.from("Marcadores").insert(marcador)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun updateMarcador(id: Int, titulo: String, descripcion: String, imageName: String, imageFile: ByteArray){
-        val image = storage.from("images").update(path = imageName, data = imageFile)
+        deleteImage(imageName)
+        val image = uploadImage(imageFile)
 
+        Log.d("UPDATE path 1", image)
         this.marcador.from("Marcadores").update({
             set("titulo", titulo)
             set("descripcion", descripcion)
-            set("imagen", buildImageUrl(image.path))
+            set("imagen", image)
         })
         { filter { eq("id", id) }}
     }
+
 
     suspend fun deleteMarcador(id: Int){
         marcador.from("Marcadores").delete{

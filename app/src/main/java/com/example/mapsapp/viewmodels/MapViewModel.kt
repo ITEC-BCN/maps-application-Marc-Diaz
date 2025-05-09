@@ -13,6 +13,9 @@ import com.example.mapsapp.MyApp
 import com.example.mapsapp.data.Marcador
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -21,9 +24,12 @@ import java.io.File
 class MapViewModel(): ViewModel() {
     val db = MyApp.database
 
+    var _cargados = MutableLiveData<Boolean>()
+    val cargados = _cargados
     //Marcadores
-    private var _marcadores = MutableLiveData<List<Marcador>>()
+    private var _marcadores = MutableLiveData(listOf<Marcador>())
     val marcadores = _marcadores
+
     private var _marcador = MutableLiveData<Marcador>()
     val marcador = _marcador
 
@@ -40,6 +46,7 @@ class MapViewModel(): ViewModel() {
     //Añadir marcador
     @RequiresApi(Build.VERSION_CODES.O)
     fun insertarMarcador(latLng: String) {
+        _cargados.value = false
         val stream = ByteArrayOutputStream()
         _imagenBitMap.value?.compress(Bitmap.CompressFormat.PNG, 0, stream)
         CoroutineScope(Dispatchers.IO).launch {
@@ -54,15 +61,20 @@ class MapViewModel(): ViewModel() {
                 imagen = imageName,
                 latLng = latLng
             ))
+            withContext(Dispatchers.Main){
+                _cargados.value = true
+            }
+
         }
     }
 
     //Actualizar marcador
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateMarcador(id: Int, titulo: String, descripcion: String, imagen : Bitmap?){
         val stream = ByteArrayOutputStream()
         imagen?.compress(Bitmap.CompressFormat.PNG, 0, stream)
-        val imageName = _marcador.value?.imagen?.removePrefix("https://aobflzinjcljzqpxpcxs.supabase.co/storage/v1/object/public/images/")
-        Log.d("PASA POR AQUI", "$imageName")
+        val imageName = _marcador.value?.imagen?.removePrefix("https://gwcqsozqzdlxjrpijrbk.supabase.co/storage/v1/object/public/images/")
+        Log.d("UPDATE nombre", "$imageName")
         CoroutineScope(Dispatchers.IO).launch {
             db.updateMarcador(
                 id, titulo, descripcion,
@@ -77,6 +89,9 @@ class MapViewModel(): ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             db.deleteMarcador(id)
             db.deleteImage(imagen)
+            withContext(Dispatchers.Main) {
+                getAllMarcadores()
+            }
         }
     }
 
@@ -114,6 +129,8 @@ class MapViewModel(): ViewModel() {
 
     private var _imagenBitMap = MutableLiveData<Bitmap>()
     val imagenBitMap = _imagenBitMap
+
+
     fun setImagenBitMap(new: Bitmap){
         _imagenBitMap.value = new
     }
@@ -126,6 +143,7 @@ class MapViewModel(): ViewModel() {
 
         _imagenURI.value = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }
+
 
 
 }

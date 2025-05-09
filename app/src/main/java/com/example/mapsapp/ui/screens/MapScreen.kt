@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -22,11 +23,10 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun MapScreen(navigateToCreateMarkerScreen : (LatLng) -> Unit, navigateToDetail: (Int) -> Unit){
     val appViewModel: MapViewModel = viewModel<MapViewModel>()
-    val marcadores by appViewModel.marcadores.observeAsState(mutableListOf())
+    val marcadores by appViewModel.marcadores.observeAsState(emptyList())
     LaunchedEffect(marcadores) {
         appViewModel.getAllMarcadores()
     }
-    Log.d("Lista", "$marcadores")
     Column(Modifier.fillMaxSize()) {
         val itb = LatLng(41.4534225, 2.1837151)
         val cameraPositionState = rememberCameraPositionState {
