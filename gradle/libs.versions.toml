@@ -23,6 +23,7 @@ secretsGradlePlugin = "2.0.1"
 serialization = "1.7.3"
 cameraLifecycle = "1.4.2"
 cameraCore = "1.4.2"
+firebaseCrashlyticsBuildtools = "3.0.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -56,6 +57,7 @@ secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.se
 supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraCore" }
+firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

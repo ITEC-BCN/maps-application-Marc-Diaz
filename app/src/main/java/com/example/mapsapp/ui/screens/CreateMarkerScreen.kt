@@ -46,6 +46,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mapsapp.viewmodels.MapViewModel
 import androidx.core.graphics.scale
+import com.example.mapsapp.data.MySupabaseClient
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

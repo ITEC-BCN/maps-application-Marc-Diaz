@@ -1,5 +1,7 @@
 package com.example.mapsapp.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -14,22 +16,22 @@ import com.example.mapsapp.ui.screens.MarkerListScreen
 import com.example.mapsapp.ui.screens.PermissionsScreen
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainNavigationWrapper() {
+fun MainNavigationWrapper(logOut: Boolean = false) {
     val navController = rememberNavController()
     NavHost(navController, Destinations.PantallaPermisos) {
 
         composable<Destinations.PantallaPermisos>{
-            PermissionsScreen { navController.navigate(Destinations.PantallaAutenticacion) }
+            PermissionsScreen { navController.navigate(Destinations.PantallaAutenticacio) }
         }
 
-        composable<Destinations.PantallaAutenticacion>{
-            AuthScreen { navController.navigate(Destinations.PantallaDrawer) }
+        composable<Destinations.PantallaAutenticacio>{
+            AuthScreen(logOut) { navController.navigate(Destinations.PantallaDrawer) }
         }
 
         composable<Destinations.PantallaDrawer>{
             DrawerScreen()
         }
-
     }
 }

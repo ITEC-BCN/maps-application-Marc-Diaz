@@ -2,12 +2,12 @@ package com.example.mapsapp.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.mapsapp.data.SupabaseManager
+import com.example.mapsapp.data.SharedPreferencesHelper
 
-class AuthViewModelFactory(private val authManager: SupabaseManager) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+class AuthViewModelFactory(private val shredPreferences: SharedPreferencesHelper, private val logOut: Boolean = false): ViewModelProvider.Factory {
+    override fun <T: ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
-            return AuthViewModel(authManager) as T
+            return AuthViewModel(shredPreferences, logOut) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

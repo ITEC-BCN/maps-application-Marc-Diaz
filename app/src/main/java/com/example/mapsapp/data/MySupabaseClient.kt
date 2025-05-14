@@ -7,26 +7,15 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import java.time.format.DateTimeFormatter
 
 
-class MySupabaseClient {
-    lateinit var marcador: SupabaseClient
-    lateinit var storage: io.github.jan.supabase.storage.Storage
+class MySupabaseClient(private val marcador : SupabaseClient) {
+    private val storage: Storage = marcador.storage
     private val supabaseUrl = BuildConfig.SUPABASE_URL
-    private val supabaseKey = BuildConfig.SUPABASE_KEY
 
-    constructor(){
-        marcador = createSupabaseClient(
-            supabaseUrl = supabaseUrl,
-            supabaseKey = supabaseKey
-        ) {
-            install(Postgrest)
-            install(io.github.jan.supabase.storage.Storage)
-        }
-        storage = marcador.storage
-    }
 
     //Imagenes
     @RequiresApi(Build.VERSION_CODES.O)
@@ -57,6 +46,7 @@ class MySupabaseClient {
     }
 
     suspend fun insertMarcador(marcador: Marcador){
+
         this.marcador.from("Marcadores").insert(marcador)
     }
 
@@ -64,8 +54,6 @@ class MySupabaseClient {
     suspend fun updateMarcador(id: Int, titulo: String, descripcion: String, imageName: String, imageFile: ByteArray){
         deleteImage(imageName)
         val image = uploadImage(imageFile)
-
-        Log.d("UPDATE path 1", image)
         this.marcador.from("Marcadores").update({
             set("titulo", titulo)
             set("descripcion", descripcion)
@@ -73,7 +61,6 @@ class MySupabaseClient {
         })
         { filter { eq("id", id) }}
     }
-
 
     suspend fun deleteMarcador(id: Int){
         marcador.from("Marcadores").delete{

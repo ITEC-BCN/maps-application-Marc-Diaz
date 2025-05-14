@@ -1,22 +1,22 @@
 package com.example.mapsapp.ui.navigation
 
-import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.mapsapp.ui.screens.AuthScreen
 import com.example.mapsapp.ui.screens.CreateMarkerScreen
 import com.example.mapsapp.ui.screens.DetailMarkerScreen
 import com.example.mapsapp.ui.screens.MapScreen
 import com.example.mapsapp.ui.screens.MarkerListScreen
-import com.example.mapsapp.ui.screens.PermissionsScreen
 import com.example.mapsapp.utils.latLangToString
-import com.example.mapsapp.utils.stringToLatLng
-import com.google.android.gms.maps.model.LatLng
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationWrapper(navController: NavHostController, modifier: Modifier) {
     NavHost(navController, Destinations.PantallaMapa) {
@@ -48,7 +48,10 @@ fun NavigationWrapper(navController: NavHostController, modifier: Modifier) {
             DetailMarkerScreen(pantallaDetalleMarcador.idMarcador){
                 navController.popBackStack()
             }
+        }
 
+        composable<Destinations.PantallaAutenticacio> {
+            MainNavigationWrapper(true)
         }
     }
 }

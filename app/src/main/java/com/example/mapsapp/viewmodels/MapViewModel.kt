@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.mapsapp.MyApp
+import com.example.mapsapp.SupabaseApplication
 import com.example.mapsapp.data.Marcador
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,8 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 class MapViewModel(): ViewModel() {
-    val db = MyApp.database
+    val db = SupabaseApplication.database
+    val auth = SupabaseApplication.supabase
 
     var _cargados = MutableLiveData<Boolean>()
     val cargados = _cargados
@@ -46,6 +47,8 @@ class MapViewModel(): ViewModel() {
     //Añadir marcador
     @RequiresApi(Build.VERSION_CODES.O)
     fun insertarMarcador(latLng: String) {
+        val session = auth.retrieveCurrentSession()
+        val userId = session?.user?.id
         _cargados.value = false
         val stream = ByteArrayOutputStream()
         _imagenBitMap.value?.compress(Bitmap.CompressFormat.PNG, 0, stream)
@@ -64,7 +67,6 @@ class MapViewModel(): ViewModel() {
             withContext(Dispatchers.Main){
                 _cargados.value = true
             }
-
         }
     }
 
