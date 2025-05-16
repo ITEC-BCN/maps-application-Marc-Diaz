@@ -19,29 +19,42 @@ import com.example.mapsapp.utils.stringToLatLng
 import com.example.mapsapp.viewmodels.AuthViewModel
 import com.example.mapsapp.viewmodels.AuthViewModelFactory
 import com.example.mapsapp.viewmodels.MapViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun MapScreen(navigateToCreateMarkerScreen : (LatLng) -> Unit, navigateToDetail: (Int) -> Unit){
+    val context = LocalContext.current
     val appViewModel: MapViewModel = viewModel<MapViewModel>()
     val marcadores by appViewModel.marcadores.observeAsState(emptyList())
+
+    val userLocation by appViewModel.userLocation.observeAsState()
+    val cameraPosition = rememberCameraPositionState()
 
     LaunchedEffect(marcadores) {
         appViewModel.getAllMarcadores()
     }
-    Column(Modifier.fillMaxSize()) {
-        val itb = LatLng(41.4534225, 2.1837151)
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(itb, 17f)
+
+    LaunchedEffect(userLocation) {
+        appViewModel.updatetUserLocation(context)
+        userLocation?.let {
+            cameraPosition.position = CameraPosition.fromLatLngZoom(userLocation!!, 17f)
         }
+    }
+
+    Column(Modifier.fillMaxSize()) {
+
         GoogleMap(
             Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
+            properties = MapProperties(isMyLocationEnabled = true),
+            cameraPositionState = cameraPosition,
             onMapLongClick = {
                 navigateToCreateMarkerScreen(it)
             }

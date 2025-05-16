@@ -90,6 +90,7 @@ fun AuthScreen(logOut: Boolean = false, navigateToHome: () -> Unit) {
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 label = { Text("Mail") }
             )
             PasswordTextField(password) {

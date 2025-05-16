@@ -2,9 +2,14 @@ package com.example.mapsapp.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -27,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.mapsapp.data.SharedPreferencesHelper
@@ -39,7 +45,7 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawerScreen() {
+fun DrawerScreen(logOut: () -> Unit) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -49,6 +55,7 @@ fun DrawerScreen() {
         gesturesEnabled = false,
         drawerContent = {
             ModalDrawerSheet(modifier = Modifier.fillMaxWidth(0.5f)) {
+
                 DrawerItem.entries.forEachIndexed { index, drawerItem ->
                     NavigationDrawerItem(
                         icon = {
@@ -65,6 +72,27 @@ fun DrawerScreen() {
                             navController.navigate(drawerItem.route)
                         }
                     )
+                }
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 24.dp),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    IconButton(
+                        onClick = { logOut() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 14.dp)
+                    ) {
+                        Row(Modifier.fillMaxWidth()) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Logout"
+                            )
+                            Text("LogOut", Modifier.padding(start = 14.dp))
+                        }
+                    }
                 }
             }
         },

@@ -51,7 +51,7 @@ fun NavigationWrapper(navController: NavHostController, modifier: Modifier) {
         }
 
         composable<Destinations.PantallaAutenticacio> {
-            MainNavigationWrapper(true)
+            MainNavigationWrapper()
         }
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -64,7 +65,7 @@ fun CreateMarkerScreen(latLng: String, navigateBack: () -> Unit) {
         navigateBack()
     } else if (cargados == false) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Insertando Marcador")
+            CircularProgressIndicator()
         }
     }
     //Camara

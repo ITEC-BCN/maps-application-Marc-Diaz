@@ -23,7 +23,8 @@ fun PermissionsScreen(navigateToAuth : () -> Unit){
     val viewModel = viewModel<PermissionViewModel>()
     val permissions = listOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.CAMERA
+        Manifest.permission.CAMERA,
+        Manifest.permission.ACCESS_COARSE_LOCATION
     )
     val permissionsStatus = viewModel.permissionsStatus.value
     var alreadyRequested by remember { mutableStateOf(false) }

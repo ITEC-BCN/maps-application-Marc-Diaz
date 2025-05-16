@@ -22,8 +22,7 @@ class AuthViewModel(private val sharedPreferences: SharedPreferencesHelper, priv
     val authState = _authState
     private val _showError = MutableLiveData<Boolean>(false)
     val showError = _showError
-    private val _user = MutableLiveData<String?>()
-    val user = _user
+
 
     //Setters
     fun editEmail(value: String) {
@@ -37,7 +36,6 @@ class AuthViewModel(private val sharedPreferences: SharedPreferencesHelper, priv
     fun errorMessageShowed(){
         _showError.value = false
     }
-
 
     init {
         if (logOut) logout()

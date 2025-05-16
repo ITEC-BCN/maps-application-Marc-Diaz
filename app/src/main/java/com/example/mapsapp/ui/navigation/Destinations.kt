@@ -24,5 +24,5 @@ sealed class Destinations{
     object PantallaDrawer: Destinations()
 
     @Serializable
-    object PantallaAutenticacio : Destinations()
+    data class PantallaAutenticacio(val logOut: Boolean) : Destinations()
 }

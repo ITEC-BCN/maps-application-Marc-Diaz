@@ -1,39 +1,58 @@
 package com.example.mapsapp.viewmodels
 
+import android.Manifest
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.mapsapp.SupabaseApplication
 import com.example.mapsapp.data.Marcador
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 
 class MapViewModel(): ViewModel() {
     val db = SupabaseApplication.database
-    val auth = SupabaseApplication.supabase
 
     var _cargados = MutableLiveData<Boolean>()
     val cargados = _cargados
+
     //Marcadores
     private var _marcadores = MutableLiveData(listOf<Marcador>())
     val marcadores = _marcadores
-
     private var _marcador = MutableLiveData<Marcador>()
     val marcador = _marcador
 
+    //Localizacion
+    private var _userLocation = MutableLiveData<LatLng>()
+    val userLocation = _userLocation
+
+
+    fun updatetUserLocation(context: Context){
+        viewModelScope.launch {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+            val location = fusedLocationClient.lastLocation.await()
+                location?.let {
+                    _userLocation.value = LatLng(it.latitude, it.longitude)
+                }
+        }
+    }
     //Obtener marcador
     fun getAllMarcadores() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -47,8 +66,6 @@ class MapViewModel(): ViewModel() {
     //Añadir marcador
     @RequiresApi(Build.VERSION_CODES.O)
     fun insertarMarcador(latLng: String) {
-        val session = auth.retrieveCurrentSession()
-        val userId = session?.user?.id
         _cargados.value = false
         val stream = ByteArrayOutputStream()
         _imagenBitMap.value?.compress(Bitmap.CompressFormat.PNG, 0, stream)
